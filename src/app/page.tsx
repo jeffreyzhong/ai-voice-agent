@@ -238,7 +238,7 @@ export default function Home() {
                   </div>
                 </div>
                 <p className="mt-6 text-xs text-[var(--text-muted)] text-center max-w-sm">
-                  Questions? Contact us at support@ringbuddy.ai
+                  Questions? Contact us at team@cartra.ai
                 </p>
               </div>
             </div>
