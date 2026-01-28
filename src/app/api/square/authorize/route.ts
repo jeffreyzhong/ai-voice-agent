@@ -30,8 +30,9 @@ export async function GET() {
     }
 
     // 3. Check required environment variables
-    const isProduction = process.env.NODE_ENV === 'production'
-    const squareAppId = isProduction
+    // Use SQUARE_ENVIRONMENT to control sandbox vs production (independent of NODE_ENV)
+    const useSquareProduction = process.env.SQUARE_ENVIRONMENT === 'production'
+    const squareAppId = useSquareProduction
       ? process.env.SQUARE_PRODUCTION_APPLICATION_ID
       : process.env.SQUARE_SANDBOX_APPLICATION_ID
     if (!squareAppId) {
@@ -48,7 +49,7 @@ export async function GET() {
     })).toString('base64url')
 
     // 5. Build the Square authorization URL
-    const baseUrl = isProduction
+    const baseUrl = useSquareProduction
       ? 'https://connect.squareup.com'
       : 'https://connect.squareupsandbox.com'
 

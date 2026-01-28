@@ -85,11 +85,12 @@ export async function GET(request: NextRequest) {
     }
 
     // 5. Exchange authorization code for tokens
-    const isProduction = process.env.NODE_ENV === 'production'
-    const squareAppId = isProduction
+    // Use SQUARE_ENVIRONMENT to control sandbox vs production (independent of NODE_ENV)
+    const useSquareProduction = process.env.SQUARE_ENVIRONMENT === 'production'
+    const squareAppId = useSquareProduction
       ? process.env.SQUARE_PRODUCTION_APPLICATION_ID
       : process.env.SQUARE_SANDBOX_APPLICATION_ID
-    const squareAppSecret = isProduction
+    const squareAppSecret = useSquareProduction
       ? process.env.SQUARE_PRODUCTION_ACCESS_TOKEN
       : process.env.SQUARE_SANDBOX_ACCESS_TOKEN
 
@@ -100,7 +101,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(redirectUrl.toString())
     }
 
-    const baseUrl = isProduction
+    const baseUrl = useSquareProduction
       ? 'https://connect.squareup.com'
       : 'https://connect.squareupsandbox.com'
 
@@ -156,7 +157,7 @@ export async function GET(request: NextRequest) {
           merchant_id: tokenData.merchant_id,
           square_access_token_encrypted: encryptedAccessToken,
           square_refresh_token_encrypted: encryptedRefreshToken,
-          is_sandbox: !isProduction,
+          is_sandbox: !useSquareProduction,
           is_active: true,
           merchant_type: 'SQUARE',
           updated_at: new Date(),
@@ -170,7 +171,7 @@ export async function GET(request: NextRequest) {
           clerk_organization_id: orgId,
           square_access_token_encrypted: encryptedAccessToken,
           square_refresh_token_encrypted: encryptedRefreshToken,
-          is_sandbox: !isProduction,
+          is_sandbox: !useSquareProduction,
           is_active: true,
           merchant_type: 'SQUARE',
         },
