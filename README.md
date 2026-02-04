@@ -98,3 +98,88 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+---
+
+## Customer Setup Process
+
+This section documents the process for setting up a customer after they successfully connect their Square account.
+
+### What Happens Automatically
+
+When a customer connects Square via OAuth, the callback handler automatically:
+
+1. **Creates/updates a `merchant` record** - Stores encrypted Square access and refresh tokens
+2. **Syncs `location` records** - Imports all active locations from the customer's Square account
+
+After this, the customer sees the message:
+> "The HaloCall team will connect your phone number and AI agent to your account within the next 24 hours."
+
+### Manual Setup Steps
+
+The following steps must be completed by the HaloCall team:
+
+#### Prerequisites (External Systems)
+Before running the setup script, ensure:
+1. **ElevenLabs Agent** - A conversational AI agent has been created in ElevenLabs
+2. **Phone Number** - A phone number has been provisioned and configured to route to the agent
+
+#### Run the Interactive Setup Script
+
+Use the provided setup script to configure the customer. The script is fully interactive and will guide you through the process:
+
+```bash
+npm run setup:customer
+```
+
+The script will:
+1. **Display recently connected customers** - Select one using arrow keys
+2. **Show synced locations** - View all locations from Square in a table format
+3. **Prompt for configuration** - Enter the phone number and ElevenLabs agent ID
+4. **Optionally grant user access** - Add location access for specific users
+5. **Create the configuration** - Sets up `phone_number_config` and `agent_config` records
+
+**Example session:**
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  🚀 HaloCall Customer Setup (Interactive)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📋 Step 1: Select a customer to set up
+
+? Choose a customer: (Use arrow keys)
+❯ Acme Wellness Spa
+  Downtown Fitness Center
+  Mountain View Yoga Studio
+```
+
+#### Verify Setup
+
+1. Log into the dashboard as the customer
+2. Confirm the agent appears in the agent selector dropdown
+3. Make a test call to the provisioned phone number
+
+#### Step 5: Notify the Customer
+
+Send a notification that their HaloCall AI agent is ready to receive calls.
+
+### Database Schema Reference
+
+```
+organization (1)
+    ├── merchant (1:1) ─────────── Square OAuth tokens
+    └── location (1:many) ──────── Synced from Square
+            └── phone_number_config (1:many) ─── Provisioned phone numbers
+                    └── agent_config (1:1) ───── ElevenLabs agent link
+```
+
+### Optional: User Location Access
+
+For organizations with non-admin users who need access to specific locations:
+
+```sql
+INSERT INTO user_location_access (clerk_organization_id, clerk_user_id, location_id)
+VALUES ('<clerk_org_id>', '<clerk_user_id>', <location_id>);
+```
+
+Or use the setup script with the `--user-id` flag to grant access during setup.

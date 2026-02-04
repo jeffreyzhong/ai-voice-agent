@@ -143,32 +143,45 @@ export default function CallVolumeChart({ conversations, timeWindow, isLoading }
           <div className="w-6 h-6 border-2 border-[var(--text-muted)] border-t-transparent rounded-full animate-spin" />
         </div>
       ) : (
-        <div className="flex items-end gap-1 h-40 overflow-x-auto">
-          {chartData.map((data, index) => {
-            const heightPercent = maxCalls > 0 ? (data.calls / maxCalls) * 100 : 0;
-            const minHeight = 4;
-            const barHeight = Math.max(heightPercent, minHeight / 128 * 100);
-            
-            return (
-              <div key={index} className="flex-1 min-w-0 flex flex-col items-center gap-1 group">
-                <div className="w-full relative flex items-end justify-center h-32">
-                  <div 
-                    className={`w-full rounded-sm transition-colors ${
-                      data.calls > 0 
-                        ? 'bg-[var(--accent-green)] group-hover:bg-[var(--accent-green-hover)]' 
-                        : 'bg-[var(--border-subtle)] group-hover:bg-[var(--text-muted)]'
-                    }`}
-                    style={{ height: `${barHeight}%`, minHeight: `${minHeight}px` }}
-                  />
-                  <div className="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs text-[var(--text-primary)] font-medium whitespace-nowrap z-10 bg-[var(--bg-secondary)] px-1.5 py-0.5 rounded border border-[var(--border-subtle)]">
-                    {data.calls} call{data.calls !== 1 ? 's' : ''}
-                    {data.fullLabel && <span className="block text-[var(--text-muted)]">{data.fullLabel}</span>}
+        <div className="flex">
+          {/* Y-axis */}
+          <div className="flex flex-col items-end pr-2 pt-12 h-52">
+            <div className="flex-1 flex flex-col justify-between h-32 text-[9px] text-[var(--text-muted)]">
+              <span>{maxCalls}</span>
+              <span>{Math.round(maxCalls / 2)}</span>
+              <span>0</span>
+            </div>
+            <div className="h-4" /> {/* Spacer for x-axis labels */}
+          </div>
+          
+          {/* Chart area */}
+          <div className="flex-1 flex items-end gap-1 h-52 pt-12 overflow-x-auto overflow-y-visible">
+            {chartData.map((data, index) => {
+              const heightPercent = maxCalls > 0 ? (data.calls / maxCalls) * 100 : 0;
+              const minHeight = 4;
+              const barHeight = Math.max(heightPercent, minHeight / 128 * 100);
+              
+              return (
+                <div key={index} className="flex-1 min-w-0 flex flex-col items-center gap-1 group">
+                  <div className="w-full relative flex items-end justify-center h-32">
+                    <div 
+                      className={`w-full rounded-sm transition-colors ${
+                        data.calls > 0 
+                          ? 'bg-[var(--accent-green)] group-hover:bg-[var(--accent-green-hover)]' 
+                          : 'bg-[var(--border-subtle)] group-hover:bg-[var(--text-muted)]'
+                      }`}
+                      style={{ height: `${barHeight}%`, minHeight: `${minHeight}px` }}
+                    />
+                    <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs text-[var(--text-primary)] font-medium whitespace-nowrap z-10 bg-[var(--bg-secondary)] px-1.5 py-0.5 rounded border border-[var(--border-subtle)] shadow-sm">
+                      {data.calls} call{data.calls !== 1 ? 's' : ''}
+                      {data.fullLabel && <span className="block text-[var(--text-muted)]">{data.fullLabel}</span>}
+                    </div>
                   </div>
+                  <span className="text-[9px] text-[var(--text-muted)] whitespace-nowrap">{data.label}</span>
                 </div>
-                <span className="text-[9px] text-[var(--text-muted)] whitespace-nowrap">{data.label}</span>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       )}
     </div>
